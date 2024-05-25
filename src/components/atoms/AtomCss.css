@@ -1,0 +1,34 @@
+/* AllCustomCSS.css */
+.custom-button {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        background-color: #1890ff;
+        transition: border 0.3s ease, color 0.3s ease;
+     }
+     
+     .custom-button:hover {
+        border: 2px solid #1890ff;
+        background-color: #46a6ff; /* Ganti dengan warna biru yang lebih gelap */
+        color: white;
+     }
+     
+     .custom-button:active,
+     .custom-button.ant-btn-clicked:active {
+        border: 2px solid #1890ff;
+        color:white
+     }
+     
+     .btn-login {
+             width: 100%;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             color: white;
+             background-color: #1890ff;
+             transition: border 0.3s ease, color 0.3s ease;
+          }
+          
+     
