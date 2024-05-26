@@ -11,13 +11,16 @@ import {
    UPDATE_ORDER_REQUEST,
    UPDATE_ORDER_SUCCESS,
    UPDATE_ORDER_FAILURE,
+   DELETE_ORDER_REQUEST,
+   DELETE_ORDER_SUCCESS,
+   DELETE_ORDER_FAILED,
 } from "../constants/actionTypes";
 
 const initialState = {
    loading: false,
    loadingDelete: false,
    data: [],
-   deletedPemasukan: null,
+   deletedOrder: null,
    error: null,
    newOrder: null,
    order: null,
@@ -82,6 +85,29 @@ const orderReducer = (state = initialState, action) => {
          return { ...state, loading: false, newOrder: action.payload };
       case UPDATE_ORDER_FAILURE:
          return { ...state, loading: false, newOrder: action.payload };
+
+      case DELETE_ORDER_REQUEST:
+         return {
+            ...state,
+            loadingDelete: true,
+            error: null,
+         };
+
+      case DELETE_ORDER_SUCCESS:
+         return {
+            ...state,
+            loadingDelete: false,
+            deletedOrder: action.payload.deletedOrder,
+            error: null,
+         };
+
+      case DELETE_ORDER_FAILED:
+         return {
+            ...state,
+            loadingDelete: false,
+            deletedOrder: null,
+            error: action.payload.error,
+         };
       default:
          return state;
    }

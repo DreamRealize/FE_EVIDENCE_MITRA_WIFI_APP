@@ -13,6 +13,7 @@ import watchEvidenSagas from "./evidenSagas";
 import watchCatStatEvidenSagas from "./catStatEvidenSagas";
 import watchCreateEvidenSagas from "./createEvidenSagas";
 import watchRegister from "./registerSagas";
+import watchDeleteOrderSagas from "./deleteOrderSagas";
 
 function* rootSaga() {
    yield all([
@@ -30,6 +31,7 @@ function* rootSaga() {
       watchCatStatEvidenSagas(),
       watchCreateEvidenSagas(),
       watchRegister(),
+      watchDeleteOrderSagas(),
       // Add other sagas here
    ]);
 }

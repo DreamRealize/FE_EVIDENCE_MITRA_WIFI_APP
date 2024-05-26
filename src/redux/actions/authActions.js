@@ -214,12 +214,7 @@ export const createEvidenFailure = (error) => ({
    payload: { error },
 });
 
-export const registerRequest = (
-   usernameId,
-   nama,
-   idUserRoles,
-   password
-) => ({
+export const registerRequest = (usernameId, nama, idUserRoles, password) => ({
    type: actionTypes.REGISTER_REQUEST,
    payload: { usernameId, nama, idUserRoles, password },
 });
@@ -236,4 +231,19 @@ export const registerSuccessRedirect = () => ({
 export const registerFailed = (errors) => ({
    type: actionTypes.REGISTER_FAILED,
    payload: errors,
+});
+
+export const deleteOrderRequest = (idOrder) => ({
+   type: actionTypes.DELETE_ORDER_REQUEST,
+   payload: { idOrder },
+});
+
+export const deleteOrderSuccess = (deletedOrder) => ({
+   type: actionTypes.DELETE_ORDER_SUCCESS,
+   payload: { deletedOrder },
+});
+
+export const deleteOrderFailed = (error) => ({
+   type: actionTypes.DELETE_ORDER_FAILED,
+   payload: { error },
 });

@@ -112,6 +112,10 @@ const CreateOrderPage = ({
       // console.log(catStatus); // Check the value of categories
       // console.log(userId?.user_id);
    }, [categoriesService, categoriesStatus, mitra]);
+
+   const assignedStatus = categoriesStatus.filter(
+      (category) => category.statusName === "Assigned"
+   );
    return (
       <>
          <MainTemplatePageCountainer
@@ -238,7 +242,7 @@ const CreateOrderPage = ({
                      ]}
                   >
                      <Select placeholder="Select categori status">
-                        {categoriesStatus.map((category) => (
+                        {assignedStatus.map((category) => (
                            <Option
                               key={category.idStatusOrder}
                               value={category.idStatusOrder}

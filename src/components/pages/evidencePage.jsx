@@ -387,12 +387,12 @@ const evidencePage = ({ evidenData, evidenRequest, userMeRequest, user }) => {
                   icon={<EditOutlined />}
                   onClick={() => handleEdit(idOrder)}
                ></Button>
-               {/* <Button
+               <Button
                   style={{ color: "red" }}
                   type="link"
                   icon={<DeleteOutlined />}
                   onClick={() => handleDelete(idOrder)}
-               ></Button> */}
+               ></Button>
             </Space>
          ),
       },

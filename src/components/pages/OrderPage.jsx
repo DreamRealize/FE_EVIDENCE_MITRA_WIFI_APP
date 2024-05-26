@@ -26,6 +26,7 @@ import {
 } from "@ant-design/icons";
 import "../../assets/styles/main.css";
 import {
+   deleteOrderRequest,
    //    deleteorderRequest,
    orderRequest,
 } from "../../redux/actions/authActions";
@@ -176,39 +177,44 @@ const CustomPagination = ({ totalItems, pageSize, onPageChange, paging }) => {
 //    },
 //    {
 //       title: "Action",
-//       dataIndex: "PemasukanID",
-//       render: (PemasukanID) => (
+//       dataIndex: "idOrder",
+//       render: (idOrder) => (
 //          <Space>
 //             <Button
 //                type="link"
 //                icon={<EditOutlined />}
-//                onClick={() => handleEdit(PemasukanID)}
+//                onClick={() => handleEdit(idOrder)}
 //             ></Button>
 //             <Button
 //                style={{ color: "red" }}
 //                type="link"
 //                icon={<DeleteOutlined />}
-//                onClick={() => handleDelete(PemasukanID)}
+//                onClick={() => handleDelete(idOrder)}
 //             ></Button>
 //          </Space>
 //       ),
 //    },
 // ];
 
-// const handleEdit = (PemasukanID) => {
+// const handleEdit = (idOrder) => {
 //    // Implement edit logic here
-//    console.log("Edit Pemasukan ID:", PemasukanID);
+//    console.log("Edit Pemasukan ID:", idOrder);
 // };
 
-// const handleDelete = (PemasukanID) => {
+// const handleDelete = (idOrder) => {
 //    // Implement delete logic here
-//    console.log("Delete Pemasukan ID:", PemasukanID);
+//    console.log("Delete Pemasukan ID:", idOrder);
 // };
 // const onChange = (pagination, filters, sorter, extra) => {
 //    console.log("params", pagination, filters, sorter, extra);
 // };
 
-const OrderPage = ({ orderData, orderRequest }) => {
+const OrderPage = ({
+   orderData,
+   orderRequest,
+   deleteOrderRequest,
+   deleteOrderAct,
+}) => {
    const {
       token: { colorBgContainer, borderRadiusLG },
    } = theme.useToken();
@@ -216,7 +222,8 @@ const OrderPage = ({ orderData, orderRequest }) => {
    const [filterModalVisible, setFilterModalVisible] = useState(false);
    const [columnModalVisible, setColumnModalVisible] = useState(false);
    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-   const [selectedPemasukanID, setSelectedPemasukanID] = useState(null);
+   const [selectedOrderID, setSelectedOrderID] = useState(null);
+   const [selectedOrderStatus, setSelectedOrderStatus] = useState(null);
    const [currentPage, setCurrentPage] = useState(1);
    const pageSize = 10; // Jumlah item per halaman
 
@@ -224,9 +231,9 @@ const OrderPage = ({ orderData, orderRequest }) => {
 
    console.log(orderData, "data");
    // console.log(orderRequest, "pemasukanreq");
-   const handleEdit = (PemasukanID) => {
+   const handleEdit = (idOrder) => {
       // Implement edit logic here
-      console.log("Edit Pemasukan ID:", PemasukanID);
+      console.log("Edit Pemasukan ID:", idOrder);
    };
 
    const onChange = (pagination, filters, sorter, extra) => {
@@ -250,18 +257,51 @@ const OrderPage = ({ orderData, orderRequest }) => {
       setFilterModalVisible(false);
    };
 
+   const handleColumnModalCancel = () => {
+      setColumnModalVisible(false);
+   };
+
+   const handleDelete = (idOrder, status) => {
+      setSelectedOrderID(idOrder);
+      setSelectedOrderStatus(status);
+      console.log("Delete Order ID:", idOrder);
+      setDeleteModalVisible(true);
+   };
+
+   const handleDeleteConfirm = async () => {
+      await deleteOrderRequest(selectedOrderID);
+      setDeleteModalVisible(false);
+
+      // Memuat ulang data setelah penghapusan berhasil
+      // orderRequest(currentPage);
+
+      // After deletion, check if we need to navigate back to the previous page
+      const newTotalItems = totalItems - 1;
+      const newTotalPages = Math.ceil(newTotalItems / pageSize);
+
+      if (currentPage > newTotalPages) {
+         // If the current page is beyond the new total pages, navigate back
+         const newPage = newTotalPages || 1; // Ensure the new page is at least 1
+         setCurrentPage(newPage);
+         onPageChange(newPage);
+      } else {
+         // Otherwise, refresh the current page
+         orderRequest(currentPage);
+      }
+   };
+
    //    const handleColumnModalCancel = () => {
    //       setColumnModalVisible(false);
    //    };
 
-   //    const handleDelete = (pemasukanID) => {
-   //       setSelectedPemasukanID(pemasukanID);
-   //       console.log("Delete Pemasukan ID:", pemasukanID);
+   //    const handleDelete = (idOrder) => {
+   //       setSelectedOrderID(idOrder);
+   //       console.log("Delete Pemasukan ID:", idOrder);
    //       setDeleteModalVisible(true);
    //    };
 
    //    const handleDeleteConfirm = async () => {
-   //       await deleteorderRequest(selectedPemasukanID);
+   //       await deleteorderRequest(selectedOrderID);
    //       setDeleteModalVisible(false);
 
    //       // Memuat ulang data setelah penghapusan berhasil
@@ -282,9 +322,9 @@ const OrderPage = ({ orderData, orderRequest }) => {
    //       }
    //    };
 
-   //    const handleDeleteCancel = () => {
-   //       setDeleteModalVisible(false);
-   //    };
+   const handleDeleteCancel = () => {
+      setDeleteModalVisible(false);
+   };
 
    // useEffect(() => {
    //    setCurrentPage(1); // Atur ulang ke halaman pertama saat terjadi perubahan data pemasukan
@@ -295,6 +335,13 @@ const OrderPage = ({ orderData, orderRequest }) => {
       orderRequest(currentPage);
    }, [orderRequest]);
 
+   useEffect(() => {
+      if (deleteOrderAct?.message === "Order deleted successfully") {
+         // Reload data after successful deletion
+         orderRequest(currentPage); // Reload current page
+      }
+   }, [deleteOrderAct, currentPage, orderRequest]);
+
    //    useEffect(() => {
    //       if (deletePemasukanAct?.message === "Pemasukan deleted successfully") {
    //          // Reload data after successful deletion
@@ -303,21 +350,21 @@ const OrderPage = ({ orderData, orderRequest }) => {
    //    }, [currentPage, orderRequest]);
    // useEffect(() => {
    //    // Reload data after successful deletion
-   //    if (selectedPemasukanID) {
+   //    if (selectedOrderID) {
    //       orderRequest(currentPage);
    //    }
    // }, [orderData]);
 
-   //    console.log(selectedPemasukanID, "tes1");
+   //    console.log(selectedOrderID, "tes1");
    console.log(orderData, "tes2");
    //    console.log(deleteorderRequest, "tes3");
    //    console.log(deletePemasukanAct?.message, "tes4");
    // useEffect(() => {
-   //    if (selectedPemasukanID !== null) {
+   //    if (selectedOrderID !== null) {
    //      // Memuat ulang data setelah penghapusan berhasil
    //      orderRequest(currentPage);
    //    }
-   //  }, [selectedPemasukanID, currentPage, orderRequest]);
+   //  }, [selectedOrderID, currentPage, orderRequest]);
 
    const columns = [
       {
@@ -356,21 +403,31 @@ const OrderPage = ({ orderData, orderRequest }) => {
       },
       {
          title: "Action",
-         dataIndex: "PemasukanID",
+         dataIndex: "idOrder",
          align: "center",
-         render: (PemasukanID) => (
+         render: (idOrder, record) => (
             <Space>
                <Button
                   type="link"
                   icon={<EditOutlined />}
-                  onClick={() => handleEdit(PemasukanID)}
+                  onClick={() => handleEdit(idOrder)}
                ></Button>
+
                <Button
                   style={{ color: "red" }}
                   type="link"
                   icon={<DeleteOutlined />}
-                  onClick={() => handleDelete(PemasukanID)}
+                  onClick={() =>
+                     handleDelete(idOrder, record.statusOrder?.statusName)
+                  }
                ></Button>
+
+               {/* <Button
+                  style={{ color: "red" }}
+                  type="link"
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDelete(idOrder)}
+               ></Button> */}
             </Space>
          ),
       },
@@ -467,6 +524,28 @@ const OrderPage = ({ orderData, orderRequest }) => {
                {/* Add your column options here */}
                <p>Column options content goes here...</p>
             </Modal>
+
+            <Modal
+               title="Delete Pemasukan"
+               visible={deleteModalVisible}
+               // onOk={handleDeleteConfirm}
+               onOk={
+                  selectedOrderStatus === "Assigned"
+                     ? handleDeleteConfirm
+                     : handleDeleteCancel
+               }
+               onCancel={handleDeleteCancel}
+            >
+               {selectedOrderStatus === "Assigned" ? (
+                  <p>Are you sure you want to delete this order?</p>
+               ) : (
+                  <p>
+                     This order cannot be deleted because it is{" "}
+                     {selectedOrderStatus}.
+                  </p>
+               )}
+            </Modal>
+
             {/* <Modal
                title="Delete Pemasukan"
                visible={deleteModalVisible}
@@ -482,10 +561,12 @@ const OrderPage = ({ orderData, orderRequest }) => {
 
 const mapStateToProps = (state) => ({
    orderData: state.order.data,
+   deleteOrderAct: state.order.deletedOrder,
 });
 
 const mapDispatchToProps = (dispatch) => ({
    orderRequest: (page) => dispatch(orderRequest(page)),
+   deleteOrderRequest: (idOrder) => dispatch(deleteOrderRequest(idOrder)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderPage);
