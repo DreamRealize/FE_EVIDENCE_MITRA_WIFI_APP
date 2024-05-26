@@ -135,6 +135,14 @@ const CreateEvidenPage = ({
       console.log(tiketFilter, "finale");
       console.log(userId, "useridbos");
    }, [tiketOrder]);
+
+   const assignedStatus = categoriesStatus.filter(
+      (category) => category.statusName === "Finish"
+   );
+
+   const assignedStatusEvidence = categoriesStatusEviden.filter(
+      (category) => category.evidenceName === "Assigned"
+   );
    return (
       <>
          <MainTemplatePageCountainer
@@ -272,7 +280,7 @@ const CreateEvidenPage = ({
                   </Form.Item>
                   <Form.Item
                      name="idStatusOrder"
-                     label="Status Order"
+                     label="Category Status"
                      rules={[
                         {
                            required: true,
@@ -281,9 +289,14 @@ const CreateEvidenPage = ({
                      ]}
                   >
                      <Select placeholder="Select categori status">
-                        <Option key={3} value={3}>
-                           {"Finish"}
-                        </Option>
+                        {assignedStatus.map((category) => (
+                           <Option
+                              key={category.idStatusOrder}
+                              value={category.idStatusOrder}
+                           >
+                              {category.statusName}
+                           </Option>
+                        ))}
                      </Select>
                   </Form.Item>
                   <Form.Item
@@ -296,11 +309,21 @@ const CreateEvidenPage = ({
                         },
                      ]}
                   >
-                     <Select placeholder="Select status">
+                     <Select placeholder="Select categori status">
+                        {assignedStatusEvidence.map((category) => (
+                           <Option
+                              key={category.idStatusEvidence}
+                              value={category.idStatusEvidence}
+                           >
+                              {category.evidenceName}
+                           </Option>
+                        ))}
+                     </Select>
+                     {/* <Select placeholder="Select status">
                         <Option key={1} value={1}>
                            {"Assigned"}
                         </Option>
-                     </Select>
+                     </Select> */}
                   </Form.Item>
                   <Form.Item>
                      <Button type="primary" htmlType="submit">

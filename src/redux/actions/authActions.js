@@ -247,3 +247,18 @@ export const deleteOrderFailed = (error) => ({
    type: actionTypes.DELETE_ORDER_FAILED,
    payload: { error },
 });
+
+export const deleteEvidenceRequest = (idEviden) => ({
+   type: actionTypes.DELETE_EVIDENCE_REQUEST,
+   payload: { idEviden },
+});
+
+export const deleteEvidenceSuccess = (deletedEviden) => ({
+   type: actionTypes.DELETE_EVIDENCE_SUCCESS,
+   payload: { deletedEviden },
+});
+
+export const deleteEvidenceFailed = (error) => ({
+   type: actionTypes.DELETE_EVIDENCE_FAILED,
+   payload: { error },
+});

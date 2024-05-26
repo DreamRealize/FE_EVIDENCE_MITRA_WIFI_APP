@@ -333,10 +333,10 @@ const OrderPage = ({
 
    useEffect(() => {
       orderRequest(currentPage);
-   }, [orderRequest]);
+   }, [orderRequest, currentPage]);
 
    useEffect(() => {
-      if (deleteOrderAct?.message === "Order deleted successfully") {
+      if (deleteOrderAct?.message === "order deleted successfully") {
          // Reload data after successful deletion
          orderRequest(currentPage); // Reload current page
       }
@@ -526,7 +526,7 @@ const OrderPage = ({
             </Modal>
 
             <Modal
-               title="Delete Pemasukan"
+               title="Delete Order"
                visible={deleteModalVisible}
                // onOk={handleDeleteConfirm}
                onOk={

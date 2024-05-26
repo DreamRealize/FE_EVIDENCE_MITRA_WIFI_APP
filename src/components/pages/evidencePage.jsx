@@ -27,6 +27,7 @@ import {
 import "../../assets/styles/main.css";
 import { useNavigate } from "react-router-dom";
 import {
+   deleteEvidenceRequest,
    //    deleteevidenRequest,
    evidenRequest,
    userMeRequest,
@@ -210,7 +211,14 @@ const CustomPagination = ({ totalItems, pageSize, onPageChange, paging }) => {
 //    console.log("params", pagination, filters, sorter, extra);
 // };
 
-const evidencePage = ({ evidenData, evidenRequest, userMeRequest, user }) => {
+const evidencePage = ({
+   evidenData,
+   evidenRequest,
+   userMeRequest,
+   user,
+   deleteEvidenceRequest,
+   deletedEvidenAct,
+}) => {
    const {
       token: { colorBgContainer, borderRadiusLG },
    } = theme.useToken();
@@ -218,9 +226,11 @@ const evidencePage = ({ evidenData, evidenRequest, userMeRequest, user }) => {
    const [filterModalVisible, setFilterModalVisible] = useState(false);
    const [columnModalVisible, setColumnModalVisible] = useState(false);
    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-   const [selectedPemasukanID, setSelectedPemasukanID] = useState(null);
+   const [selectedEvidenceID, setSelectedEvidenceID] = useState(null);
+   const [selectedEvidenceStatus, setSelectedEvidenceStatus] = useState(null);
    const [currentPage, setCurrentPage] = useState(1);
    const [filteredData, setFilteredData] = useState([]);
+   const [selectedOrderStatus, setSelectedOrderStatus] = useState(null);
    const pageSize = 10; // Jumlah item per halaman
    const navigate = useNavigate();
 
@@ -254,15 +264,38 @@ const evidencePage = ({ evidenData, evidenRequest, userMeRequest, user }) => {
       setFilterModalVisible(false);
    };
 
-   //    const handleColumnModalCancel = () => {
-   //       setColumnModalVisible(false);
-   //    };
+   const handleColumnModalCancel = () => {
+      setColumnModalVisible(false);
+   };
 
-   //    const handleDelete = (pemasukanID) => {
-   //       setSelectedPemasukanID(pemasukanID);
-   //       console.log("Delete Pemasukan ID:", pemasukanID);
-   //       setDeleteModalVisible(true);
-   //    };
+   const handleDelete = (idEviden, status) => {
+      setSelectedEvidenceID(idEviden);
+      setSelectedEvidenceStatus(status);
+      console.log("Delete Pemasukan ID:", idEviden);
+      setDeleteModalVisible(true);
+   };
+
+   const handleDeleteConfirm = async () => {
+      await deleteEvidenceRequest(selectedEvidenceID);
+      setDeleteModalVisible(false);
+
+      // Memuat ulang data setelah penghapusan berhasil
+      // orderRequest(currentPage);
+
+      // After deletion, check if we need to navigate back to the previous page
+      const newTotalItems = totalItems - 1;
+      const newTotalPages = Math.ceil(newTotalItems / pageSize);
+
+      if (currentPage > newTotalPages) {
+         // If the current page is beyond the new total pages, navigate back
+         const newPage = newTotalPages || 1; // Ensure the new page is at least 1
+         setCurrentPage(newPage);
+         onPageChange(newPage);
+      } else {
+         // Otherwise, refresh the current page
+         evidenRequest(currentPage);
+      }
+   };
 
    //    const handleDeleteConfirm = async () => {
    //       await deleteevidenRequest(selectedPemasukanID);
@@ -286,18 +319,21 @@ const evidencePage = ({ evidenData, evidenRequest, userMeRequest, user }) => {
    //       }
    //    };
 
-   //    const handleDeleteCancel = () => {
-   //       setDeleteModalVisible(false);
-   //    };
+   // const handleDeleteCancel = () => {
+   //    setDeleteModalVisible(false);
+   // };
 
    // useEffect(() => {
    //    setCurrentPage(1); // Atur ulang ke halaman pertama saat terjadi perubahan data pemasukan
    //    evidenRequest(1); // Panggil ulang data untuk halaman pertama
    // }, [evidenData]); // Pantau perubahan data pemasukan
+   const handleDeleteCancel = () => {
+      setDeleteModalVisible(false);
+   };
 
    useEffect(() => {
       evidenRequest(currentPage);
-   }, [evidenRequest]);
+   }, [currentPage, evidenRequest]);
 
    useEffect(() => {
       //       console.log(user.idUsers, "userbos");
@@ -310,6 +346,15 @@ const evidencePage = ({ evidenData, evidenRequest, userMeRequest, user }) => {
          setFilteredData(mitraData);
       }
    }, [evidenData, user]);
+
+   console.log(deletedEvidenAct, "kocak");
+   useEffect(() => {
+      if (deletedEvidenAct?.message === "eviden deleted successfully") {
+         // Reload data after successful deletion
+
+         evidenRequest(currentPage); // Reload current page
+      }
+   }, [deletedEvidenAct, currentPage, evidenRequest]);
 
    //    useEffect(() => {
    //       if (deletePemasukanAct?.message === "Pemasukan deleted successfully") {
@@ -378,20 +423,22 @@ const evidencePage = ({ evidenData, evidenRequest, userMeRequest, user }) => {
       },
       {
          title: "Action",
-         dataIndex: "idOrder",
+         dataIndex: "idEviden",
          align: "center",
-         render: (idOrder) => (
+         render: (idEviden, record) => (
             <Space>
                <Button
                   type="link"
                   icon={<EditOutlined />}
-                  onClick={() => handleEdit(idOrder)}
+                  onClick={() => handleEdit(idEviden)}
                ></Button>
                <Button
                   style={{ color: "red" }}
                   type="link"
                   icon={<DeleteOutlined />}
-                  onClick={() => handleDelete(idOrder)}
+                  onClick={() =>
+                     handleDelete(idEviden, record.statusEviden?.evidenceName)
+                  }
                ></Button>
             </Space>
          ),
@@ -489,6 +536,26 @@ const evidencePage = ({ evidenData, evidenRequest, userMeRequest, user }) => {
                {/* Add your column options here */}
                <p>Column options content goes here...</p>
             </Modal>
+            <Modal
+               title="Delete Evidence"
+               visible={deleteModalVisible}
+               // onOk={handleDeleteConfirm}
+               onOk={
+                  selectedEvidenceStatus === "Assigned"
+                     ? handleDeleteConfirm
+                     : handleDeleteCancel
+               }
+               onCancel={handleDeleteCancel}
+            >
+               {selectedEvidenceStatus === "Assigned" ? (
+                  <p>Are you sure you want to delete this order?</p>
+               ) : (
+                  <p>
+                     This order cannot be deleted because it is{" "}
+                     {selectedEvidenceStatus}.
+                  </p>
+               )}
+            </Modal>
             {/* <Modal
                title="Delete Pemasukan"
                visible={deleteModalVisible}
@@ -505,11 +572,14 @@ const evidencePage = ({ evidenData, evidenRequest, userMeRequest, user }) => {
 const mapStateToProps = (state) => ({
    evidenData: state.eviden.data,
    user: state.me.user,
+   deletedEvidenAct: state.eviden.deletedEviden,
 });
 
 const mapDispatchToProps = (dispatch) => ({
    evidenRequest: (page) => dispatch(evidenRequest(page)),
    userMeRequest,
+   deleteEvidenceRequest: (idEviden) =>
+      dispatch(deleteEvidenceRequest(idEviden)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(evidencePage);
