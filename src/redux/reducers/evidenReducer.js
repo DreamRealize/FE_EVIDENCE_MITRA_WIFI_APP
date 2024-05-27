@@ -8,6 +8,12 @@ import {
    DELETE_EVIDENCE_REQUEST,
    DELETE_EVIDENCE_SUCCESS,
    DELETE_EVIDENCE_FAILED,
+   GET_EVIDENCE_BY_ID_REQUEST,
+   GET_EVIDENCE_BY_ID_SUCCESS,
+   GET_EVIDENCE_BY_ID_FAILURE,
+   UPDATE_EVIDENCE_REQUEST,
+   UPDATE_EVIDENCE_SUCCESS,
+   UPDATE_EVIDENCE_FAILURE,
 } from "../constants/actionTypes";
 
 const initialState = {
@@ -17,7 +23,7 @@ const initialState = {
    deletedEviden: null,
    error: null,
    newEviden: null,
-   order: null,
+   eviden: null,
 };
 
 const evidenReducer = (state = initialState, action) => {
@@ -76,6 +82,32 @@ const evidenReducer = (state = initialState, action) => {
             deletedEviden: null,
             error: action.payload.error,
          };
+
+      case GET_EVIDENCE_BY_ID_REQUEST:
+         return {
+            ...state,
+            loading: true,
+            error: null,
+         };
+      case GET_EVIDENCE_BY_ID_SUCCESS:
+         return {
+            ...state,
+            loading: false,
+            eviden: action.payload,
+         };
+      case GET_EVIDENCE_BY_ID_FAILURE:
+         return {
+            ...state,
+            loading: false,
+            error: action.payload,
+         };
+
+      case UPDATE_EVIDENCE_REQUEST:
+         return { ...state, loading: true, error: null };
+      case UPDATE_EVIDENCE_SUCCESS:
+         return { ...state, loading: false, newEviden: action.payload };
+      case UPDATE_EVIDENCE_FAILURE:
+         return { ...state, loading: false, newEviden: action.payload };
 
       default:
          return state;

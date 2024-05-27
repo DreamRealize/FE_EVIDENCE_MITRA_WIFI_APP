@@ -14,6 +14,7 @@ import CreateEvidenPage from "../components/pages/CreateEvidenPage";
 import EvidenceMitraPage from "../components/pages/EvidenceMitraPage";
 import MitraPage from "../components/pages/mitraPage";
 import CreateMitraPage from "../components/pages/CreateMitraPage";
+import UpdateEvidenceAdmin from "../components/pages/UpdateEvidenceAdmin";
 const Routes = () => {
    return useRoutes([
       { path: "/404", element: <NotFoundPage /> },
@@ -58,6 +59,10 @@ const Routes = () => {
             {
                path: "EvidenceMitra",
                element: <EvidenceMitraPage />,
+            },
+            {
+               path: "EvidenceMitra/edit/:idEviden",
+               element: <UpdateEvidenceAdmin />,
             },
             {
                path: "Mitra",

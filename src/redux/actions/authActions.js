@@ -262,3 +262,33 @@ export const deleteEvidenceFailed = (error) => ({
    type: actionTypes.DELETE_EVIDENCE_FAILED,
    payload: { error },
 });
+
+export const getEvidenceByIdRequest = (idEviden) => ({
+   type: actionTypes.GET_EVIDENCE_BY_ID_REQUEST,
+   payload: idEviden,
+});
+
+export const getEvidenceByIdSuccess = (eviden) => ({
+   type: actionTypes.GET_EVIDENCE_BY_ID_SUCCESS,
+   payload: eviden,
+});
+
+export const getEvidenceByIdFailure = (error) => ({
+   type: actionTypes.GET_EVIDENCE_BY_ID_FAILURE,
+   payload: error,
+});
+
+export const updateEvidenceRequest = (idEviden, evidenData) => ({
+   type: actionTypes.UPDATE_EVIDENCE_REQUEST,
+   payload: { idEviden, evidenData },
+});
+
+export const updateEvidenceSuccess = (eviden) => ({
+   type: actionTypes.UPDATE_EVIDENCE_SUCCESS,
+   payload: eviden,
+});
+
+export const updateEvidenceFailure = (error) => ({
+   type: actionTypes.UPDATE_EVIDENCE_FAILURE,
+   payload: error,
+});

@@ -240,7 +240,7 @@ const evidencePage = ({
    // console.log(evidenRequest, "pemasukanreq");
    const handleEdit = (idOrder) => {
       // Implement edit logic here
-      navigate(`/dashboard/NewOrder/edit/${idOrder}`);
+      navigate(`/dashboard/EvidenceMitra/edit/${idOrder}`);
    };
 
    const onChange = (pagination, filters, sorter, extra) => {
@@ -427,11 +427,11 @@ const evidencePage = ({
          align: "center",
          render: (idEviden, record) => (
             <Space>
-               <Button
+               {/* <Button
                   type="link"
                   icon={<EditOutlined />}
                   onClick={() => handleEdit(idEviden)}
-               ></Button>
+               ></Button> */}
                <Button
                   style={{ color: "red" }}
                   type="link"
