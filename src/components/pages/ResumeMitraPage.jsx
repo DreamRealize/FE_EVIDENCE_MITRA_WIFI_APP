@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import MainTemplatePageCountainer from "../templates/MainTemplatePageCountainer";
 import { theme, Row, Col, Card, Typography } from "antd";
 import { connect } from "react-redux";
@@ -6,6 +6,7 @@ import {
    fetchMitraRequest,
    orderRequest,
    evidenRequest,
+   userMeRequest,
 } from "../../redux/actions/authActions";
 import { DownloadOutlined } from "@ant-design/icons";
 import { Content } from "antd/es/layout/layout";
@@ -13,17 +14,22 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 const { Title, Text } = Typography;
 
-const DashBoard = ({
+const ResumeMitraPage = ({
    mitraData,
    fetchMitraRequest,
    orderData,
    orderRequest,
    evidenData,
    evidenRequest,
+   userMeRequest,
+   user,
 }) => {
    const {
       token: { colorBgContainer, borderRadiusLG },
    } = theme.useToken();
+
+   const [filterOrder, setFilterOrder] = useState();
+   const [filterEvidence, setFilterEvidence] = useState();
 
    useEffect(() => {
       fetchMitraRequest();
@@ -35,26 +41,55 @@ const DashBoard = ({
    console.log(orderData, "caridata");
    console.log(evidenData, "carieviden");
 
-   const troubleShootOrders = orderData?.data?.filter(
+   useEffect(() => {
+      //       console.log(user.idUsers, "userbos");
+      //       let getId = user.idUsers;
+      //       console.log(getId, "kikuk");
+      if (orderData?.data) {
+         const mitraData = orderData.data.filter(
+            (order) => order.user?.idUsers === user?.idUsers // Assuming 2 is the role ID for "Mitra"
+         );
+         setFilterOrder(mitraData);
+      }
+      if (evidenData?.data) {
+         const dataEviden = evidenData.data.filter(
+            (order) => order.user?.idUsers === user?.idUsers // Assuming 2 is the role ID for "Mitra"
+         );
+         setFilterEvidence(dataEviden);
+      }
+   }, [orderData, user, evidenData]);
+
+   console.log(filterOrder, "ini filter order");
+   console.log(filterEvidence, "ini filter eviden");
+
+   const troubleShootOrders = filterOrder?.filter(
       (order) => order.service.serviceName === "Trouble Shoot"
    ).length;
 
-   const pasangBaruOrders = orderData?.data?.filter(
+   const pasangBaruOrders = filterOrder?.filter(
       (order) => order.service.serviceName === "Pasang Baru"
+   ).length;
+
+   const finishOrders = filterOrder?.filter(
+      (order) => order.statusOrder.statusName === "Finish"
+   ).length;
+   const unfinishOrders = filterOrder?.filter(
+      (order) => order.statusOrder.statusName === "Assigned"
    ).length;
 
    console.log(`Total Trouble Shoot Orders: ${troubleShootOrders}`);
    console.log(`Total Pasang Baru Orders: ${pasangBaruOrders}`);
+   console.log(`Total Finish Orders: ${finishOrders}`);
 
-   const evidenceApproved = evidenData?.data?.filter(
+   const evidenceApproved = filterEvidence?.filter(
       (eviden) => eviden.statusEviden.evidenceName === "Approved"
    ).length;
 
-   const evidenceAssigned = evidenData?.data?.filter(
+   const evidenceAssigned = filterEvidence?.filter(
       (eviden) => eviden.statusEviden.evidenceName === "Assigned"
    ).length;
 
-   const evidenceCancelled = evidenData?.data?.filter(
+   const evidenceCancelled = filterEvidence?.filter(
       (eviden) => eviden.statusEviden.evidenceName === "Cancelled"
    ).length;
 
@@ -67,8 +102,8 @@ const DashBoard = ({
       return ((evidences / orders) * 100).toFixed(2);
    };
 
-   const totalOrders = orderData?.data?.length || 0;
-   const totalEvidences = evidenData?.data?.length || 0;
+   const totalOrders = filterOrder?.length || 0;
+   const totalEvidences = filterEvidence?.length || 0;
    const completionPercentage = calculateCompletionPercentage(
       totalOrders,
       totalEvidences
@@ -84,8 +119,14 @@ const DashBoard = ({
          title: "Order Categories",
          value: (
             <>
-               <div style={{ display: "flex", alignItems: "center" }}>
-                  <div
+               <div
+                  style={{
+                     display: "flex",
+                     alignItems: "center",
+                     fontWeight: "500",
+                  }}
+               >
+                  {/* <div
                      style={{
                         width: 10,
                         height: 10,
@@ -93,7 +134,7 @@ const DashBoard = ({
                         borderRadius: "50%",
                         marginRight: 5,
                      }}
-                  ></div>
+                  ></div> */}
                   Total Orders: {totalOrders}
                </div>
                <div style={{ display: "flex", alignItems: "center" }}>
@@ -127,8 +168,14 @@ const DashBoard = ({
          title: "Evidence Status",
          value: (
             <>
-               <div style={{ display: "flex", alignItems: "center" }}>
-                  <div
+               <div
+                  style={{
+                     display: "flex",
+                     alignItems: "center",
+                     fontWeight: "500",
+                  }}
+               >
+                  {/* <div
                      style={{
                         width: 10,
                         height: 10,
@@ -136,7 +183,7 @@ const DashBoard = ({
                         borderRadius: "50%",
                         marginRight: 5,
                      }}
-                  ></div>
+                  ></div> */}
                   Total Evidence: {totalEvidences}
                </div>
                <div style={{ display: "flex", alignItems: "center" }}>
@@ -168,7 +215,7 @@ const DashBoard = ({
                      style={{
                         width: 10,
                         height: 10,
-                        backgroundColor: "##641E16",
+                        backgroundColor: "#641E16",
                         borderRadius: "50%",
                         marginRight: 5,
                      }}
@@ -180,15 +227,60 @@ const DashBoard = ({
       },
       {
          title: "Order Status",
-         value: `${completionPercentage}%`,
-         color: getCompletionTextColor(completionPercentage),
+         value: (
+            <>
+               <div
+                  style={{
+                     display: "flex",
+                     alignItems: "center",
+                     fontWeight: "500",
+                     color: getCompletionTextColor(completionPercentage),
+                  }}
+               >
+                  {/* <div
+                         style={{
+                            width: 10,
+                            height: 10,
+                            backgroundColor: "green",
+                            borderRadius: "50%",
+                            marginRight: 5,
+                         }}
+                      ></div> */}
+                  Progress Order: {completionPercentage + "%"}
+               </div>
+               <div style={{ display: "flex", alignItems: "center" }}>
+                  <div
+                     style={{
+                        width: 10,
+                        height: 10,
+                        backgroundColor: "#FF5733",
+                        borderRadius: "50%",
+                        marginRight: 5,
+                     }}
+                  ></div>
+                  Order Finish: {finishOrders}
+               </div>
+               <div style={{ display: "flex", alignItems: "center" }}>
+                  <div
+                     style={{
+                        width: 10,
+                        height: 10,
+                        backgroundColor: "#C70039",
+                        borderRadius: "50%",
+                        marginRight: 5,
+                     }}
+                  ></div>
+                  Order Unfinished: {unfinishOrders}
+               </div>
+            </>
+         ),
       },
    ];
 
    // Data for Pie chart
    const pieData = [
-      { name: "Evidence", value: totalEvidences },
-      { name: "Orders", value: totalOrders },
+      { name: "Order Finish", value: finishOrders },
+      { name: "Order Unfinish", value: unfinishOrders },
    ];
 
    const pieDataEvidence = [
@@ -199,7 +291,7 @@ const DashBoard = ({
 
    const COLORS = ["#F1C40F", "#FF5733"];
 
-   const COLORSEVIDENCE = ["#F1C40F","#FF5733","#641E16"];
+   const COLORSEVIDENCE = ["#F1C40F", "#FF5733", "#641E16"];
 
    const pieDataOrder = [
       // { name: "Orders", value: totalOrders },
@@ -256,7 +348,7 @@ const DashBoard = ({
             }}
          >
             <div style={{ textAlign: "center" }}>
-               <h1>TELKOM WIFI LAPORAN APP</h1>
+               <h1>Resume Laporan WIFI Mitra</h1>
             </div>
             <Row gutter={16} style={{ padding: "20px" }}>
                {cardData.map((card, index) => (
@@ -383,12 +475,14 @@ const mapStateToProps = (state) => ({
    mitraData: state.mitra.mitra,
    orderData: state.order.data,
    evidenData: state.eviden.data,
+   user: state.me.user,
 });
 
 const mapDispatchToProps = (dispatch) => ({
    fetchMitraRequest: (page) => dispatch(fetchMitraRequest(page)),
    orderRequest: (page) => dispatch(orderRequest(page)),
    evidenRequest: (page) => dispatch(evidenRequest(page)),
+   userMeRequest,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(DashBoard);
+export default connect(mapStateToProps, mapDispatchToProps)(ResumeMitraPage);

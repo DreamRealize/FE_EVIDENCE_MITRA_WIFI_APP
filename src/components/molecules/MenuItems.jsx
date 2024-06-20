@@ -55,7 +55,7 @@ const MenuItems = ({
       } else if (userRole === "Mitra") {
          // For mitra, show only Overview
          return [
-            getItem("Overview", "1", <PieChartOutlined />),
+            getItem("Resume", "1", <PieChartOutlined />),
             getItem("NewOrder", "2", <PieChartOutlined />),
             getItem("Evidence", "3", <PieChartOutlined />),
          ];

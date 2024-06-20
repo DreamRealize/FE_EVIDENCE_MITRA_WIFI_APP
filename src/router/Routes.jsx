@@ -15,6 +15,7 @@ import EvidenceMitraPage from "../components/pages/EvidenceMitraPage";
 import MitraPage from "../components/pages/mitraPage";
 import CreateMitraPage from "../components/pages/CreateMitraPage";
 import UpdateEvidenceAdmin from "../components/pages/UpdateEvidenceAdmin";
+import ResumeMitraPage from "../components/pages/ResumeMitraPage";
 const Routes = () => {
    return useRoutes([
       { path: "/404", element: <NotFoundPage /> },
@@ -27,6 +28,10 @@ const Routes = () => {
             {
                path: "Overview",
                element: <DashBoard />,
+            },
+            {
+               path: "Resume",
+               element: <ResumeMitraPage />,
             },
             {
                path: "Services",
